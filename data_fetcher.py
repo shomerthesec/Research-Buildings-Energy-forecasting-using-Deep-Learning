@@ -16,7 +16,7 @@ class Fetcher(BaseEstimator, TransformerMixin):
     
     def transform(self, x):
         df= x.copy()
-        df= df.drop(['Unnamed: 0' , 'precip_depth_1_hr' , 'cloud_coverage', 'site_id' , 'square_feet'], axis=1)
+        df= df.drop(['Unnamed: 0' , 'precip_depth_1_hr' , 'cloud_coverage', 'site_id' ,'square_feet'], axis=1)
         
         if self.primary_use == 99:
             
