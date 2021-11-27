@@ -10,11 +10,11 @@ import numpy as np , pandas as pd
 
     
 
-def transformation_pipeline(data):
+def transformation_pipeline(data, building_id=122 , meter=0 , primary_use= 99 ):
     '''
     returns pipeline and data_cleaned
     '''
-    fetcher= Fetcher() # to clean the data
+    fetcher= Fetcher(building_id , meter , primary_use ) # to clean the data
     data_cleaned= fetcher.transform(data)
 
     numerical_pipeline = Pipeline([ ('imputer', SimpleImputer()), # to fill missing values with mean
