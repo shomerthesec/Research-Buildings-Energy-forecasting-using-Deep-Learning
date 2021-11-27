@@ -5,4 +5,5 @@
 *.pb
 *.pb
 *.data-00000-of-00001
-models/*
+models/
+.ipynb_checkpoints
