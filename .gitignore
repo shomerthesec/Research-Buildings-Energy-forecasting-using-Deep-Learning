@@ -5,3 +5,4 @@
 *.pb
 *.pb
 *.data-00000-of-00001
+models/LSTM_per_hour_model/variables/variables.data-00000-of-00001
