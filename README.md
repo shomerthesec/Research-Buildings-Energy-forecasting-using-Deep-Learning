@@ -1,2 +1,2 @@
-# Timeseries_forecasting_research_on_ashrae_dataset
- Me and @mennanawar research on timeseries forecasting on the ASHRAE dataset provided by kaggle.
+# Research on using different Deep Learning models for forecasting Buildings' Energy consumbtion
+The research conducted by me and @mennanawar using the ASHRAE dataset provided by kaggle.
