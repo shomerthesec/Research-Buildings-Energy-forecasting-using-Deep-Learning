@@ -9,3 +9,4 @@ models/*.data*
 models/*.index
 models/*.pb
 .ipynb_checkpoints/*.ipynb
+*.pyc
