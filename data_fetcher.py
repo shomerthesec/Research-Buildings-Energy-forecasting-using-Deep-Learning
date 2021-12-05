@@ -14,6 +14,16 @@ class Fetcher(BaseEstimator, TransformerMixin):
     def fit(self, x, y=None):
         return self  # nothing else to do
 
+    def season_finder(self, month):  # 0 for sprint - 1 for summer - 2 for fall - 3 for winter
+        if month in [3, 4, 5]:
+            return 0
+        elif month in [6, 7, 8]:
+            return 1
+        elif month in [9, 10, 11]:
+            return 2
+        elif month in [12, 1, 2]:
+            return 3
+
     def transform(self, x):
         df = x.copy()
         df = df.drop(['Unnamed: 0', 'precip_depth_1_hr',
@@ -34,6 +44,7 @@ class Fetcher(BaseEstimator, TransformerMixin):
                     axis=1, inplace=True)
 
         df.loc[:, "timestamp"] = pd.to_datetime(df.loc[:, "timestamp"])
+        df['season'] = df.month.apply(self.season_finder)
         df['weekend'] = df.timestamp.dt.dayofweek > 4
         df['day_of_the_week'] = df.timestamp.dt.dayofweek
         df.set_index('timestamp', inplace=True)
