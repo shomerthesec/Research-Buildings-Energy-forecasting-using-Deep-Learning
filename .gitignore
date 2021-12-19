@@ -11,3 +11,4 @@ models/*.pb
 .ipynb_checkpoints/*.ipynb
 *.pyc
 *.pyc
+*.pyc
