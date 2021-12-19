@@ -72,7 +72,8 @@ val_gen = tf.keras.preprocessing.sequence.TimeseriesGenerator(x_val,
 # %% Creating the model
 
 
-model = tf.keras.Sequential([tf.keras.layers.LSTM(128, activation='relu', return_sequences=False),
+model = tf.keras.Sequential([tf.keras.layers.LSTM(128, activation='relu',
+                                                  return_sequences=False),
                             tf.keras.layers.Dense(1)])
 
 
@@ -81,14 +82,14 @@ model = tf.keras.Sequential([tf.keras.layers.LSTM(128, activation='relu', return
 
 model.compile(loss='mse', optimizer=tf.keras.optimizers.Adam(0.0001))
 
-cb = tf.keras.callbacks.ModelCheckpoint(filepath='models/LSTM_ADAM',
-                                        monitor='val_loss',
-                                        verbose=0, save_best_only=True)
+# cb = tf.keras.callbacks.ModelCheckpoint(filepath='models/LSTM_ADAM',
+#                                        monitor='val_loss',
+#                                        verbose=0, save_best_only=True)
 # Fitting the model
 history = model.fit(train_gen,
                     validation_data=val_gen,
                     epochs=100,
-                    callbacks=[cb],
+                    # callbacks=[cb],
                     shuffle=False)
 
 # %% loading best model
