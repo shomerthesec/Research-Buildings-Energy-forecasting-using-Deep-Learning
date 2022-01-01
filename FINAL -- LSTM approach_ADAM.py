@@ -82,18 +82,21 @@ model = tf.keras.Sequential([tf.keras.layers.LSTM(128, activation='relu',
 
 model.compile(loss='mse', optimizer=tf.keras.optimizers.Adam(0.0001))
 
-# cb = tf.keras.callbacks.ModelCheckpoint(filepath='models/LSTM_ADAM',
-#                                        monitor='val_loss',
-#                                        verbose=0, save_best_only=True)
+cb = tf.keras.callbacks.EarlyStopping(monitor='val_loss',
+                                      patience=10,
+                                      restore_best_weights=True)
 # Fitting the model
 history = model.fit(train_gen,
                     validation_data=val_gen,
                     epochs=100,
-                    # callbacks=[cb],
+                    callbacks=[cb],
                     shuffle=False)
 
+# %% saving the model
+model.save('models/LSTM_ADAM')
+
 # %% loading best model
-model = tf.keras.models.load_model('models/LSTM_ADAM')
+#model = tf.keras.models.load_model('models/LSTM_ADAM')
 
 # %% Displaying 1 batch of the validation data
 
@@ -133,6 +136,10 @@ for i in range(32):
     predicted.extend(model.predict(val_gen[i][0]))
     actual.extend(val_gen[i][1])
 
+# %%
+
+print('Testing Loss= ', np.mean(tf.keras.losses.MSE(actual, predicted)))
+# mean loss= 0.03597
 
 # %% plotting the validation set output vs the predicted value
 
@@ -141,17 +148,17 @@ fig, (ax1, ax2, ax) = plt.subplots(3, 1,  figsize=(30, 15), sharex=True)
 
 ax1.plot(range(len(actual)),
          predicted,
-         color='green')
+         color='green', marker='o', linestyle='dashed', label='Predicted')
 plt.legend()
 
 ax2.plot(range(len(actual)),
          actual,
-         color='red')
+         color='red', marker='x', label='Actual')
 plt.legend()
 
 ax.plot(range(len(actual)),
         predicted,
-        color='green',
+        color='green', linestyle='dashed',
         label='Predicted')
 plt.legend()
 ax.plot(range(len(actual)),
@@ -177,25 +184,29 @@ fig, (ax1, ax2, ax) = plt.subplots(3, 1,  figsize=(30, 15), sharex=True)
 
 ax1.plot(range(len(actual_t)),
          predicted_t,
-         color='green')
+         color='green', marker='o', linestyle='dashed',
+         label='Predicted')
 
 ax2.plot(range(len(actual_t)),
          actual_t,
-         color='red')
+         color='red', marker='x', label='Actual')
 
 
 ax.plot(range(len(actual_t)),
         predicted_t,
-        color='green',
+        color='green', linestyle='dashed',
         label='Predicted')
 
 ax.plot(range(len(actual_t)),
         actual_t,
         color='red',
         label='actual')
-plt.title('Traine_set', loc='center')
+plt.title('Train_set', loc='center')
 
 plt.legend()
 
 plt.show()
 # In[ ]:
+
+model.summary()
+# parameters= 71,809

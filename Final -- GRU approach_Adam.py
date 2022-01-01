@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Dec 28 17:36:30 2021
+Created on Sat Jan  1 12:40:27 2022
 
 @author: Shomer
 """
+
+# In[Importing libraries]:
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from data_pipeline import transformation_pipeline
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
-from tensorflow.keras import layers
 
-# %%
+
 # %% Reading data
 
 
@@ -30,6 +33,20 @@ pipeline, data_cleaned = transformation_pipeline(
 
 
 transformed_data = pipeline.fit_transform(data_cleaned)
+display(pd.DataFrame(transformed_data, index=data_cleaned.index,
+        columns=data_cleaned.columns).head())
+
+
+# %% displaying the meter reading
+
+
+display(transformed_data[:, 0])  # this gives us the meter reading
+
+
+# %% Showing the rest of the data
+
+display(transformed_data[:, 1:])  # this gives us the rest of the columns
+
 
 # %% Splitting the data
 
@@ -57,83 +74,32 @@ val_gen = tf.keras.preprocessing.sequence.TimeseriesGenerator(x_val,
                                                               )
 
 
-# %% Creating the model class
-
-def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
-    # Normalization and Attention
-    x = layers.LayerNormalization(epsilon=1e-6)(inputs)
-    x = layers.MultiHeadAttention(
-        key_dim=head_size, num_heads=num_heads, dropout=dropout)(x, x)
-    x = layers.Dropout(dropout)(x)
-    res = x + inputs
-
-    # Feed Forward Part
-    x = layers.LayerNormalization(epsilon=1e-6)(res)
-    x = layers.Conv1D(filters=ff_dim, kernel_size=1, activation="relu")(x)
-    x = layers.Dropout(dropout)(x)
-    x = layers.Conv1D(filters=inputs.shape[-1], kernel_size=1)(x)
-    return x + res
+# %% Creating the model
 
 
-def build_model(
-    input_shape,
-    head_size,
-    num_heads,
-    ff_dim,
-    num_transformer_blocks,
-    mlp_units,
-    dropout=0,
-    mlp_dropout=0,
-):
-    inputs = tf.keras.Input(shape=input_shape)
-    x = inputs
-    for _ in range(num_transformer_blocks):
-        x = transformer_encoder(x, head_size, num_heads, ff_dim, dropout)
+model = tf.keras.Sequential([tf.keras.layers.GRU(128, activation='relu',
+                                                 return_sequences=False),
+                            tf.keras.layers.Dense(1)])
 
-    x = layers.GlobalAveragePooling1D()(x)
 
-    for dim in mlp_units:
-        x = layers.Dense(dim, activation="relu")(x)
-        x = layers.Dropout(mlp_dropout)(x)
+# %% Training the model
 
-    outputs = layers.Dense(1)(x)
-    return tf.keras.Model(inputs, outputs)
 
+model.compile(loss='mse', optimizer=tf.keras.optimizers.Adam(0.0001))
+
+cb = tf.keras.callbacks.EarlyStopping(monitor='val_loss',
+                                      patience=10,
+                                      restore_best_weights=True)
+# Fitting the model
+history = model.fit(train_gen,
+                    validation_data=val_gen,
+                    epochs=100,
+                    callbacks=[cb],
+                    shuffle=False)
 # %%
-
-
-model = build_model(
-    (6, 11),  # 6 is for the window on our data 6 hours, and 11 for the features
-    head_size=256,  # play with this
-    num_heads=8,  # and this
-    ff_dim=128,  # and this
-    num_transformer_blocks=1,  # and this
-    mlp_units=[256],
-    mlp_dropout=0.0,
-    dropout=0.0,
-)
-
-model.compile(
-    loss="mse",
-    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
-)
-
-model.summary()
-
-# %%
-callbacks = [tf.keras.callbacks.EarlyStopping(
-    patience=10, restore_best_weights=True)]
-
-model.fit(train_gen, validation_data=val_gen,
-          epochs=200,
-          callbacks=callbacks,
-          )
-
-# %%
-model.save('models/Transformer_ADAM')
-
+model.save(('models/GRU_ADAM'))
 # %% loading best model
-#model = tf.keras.models.load_model('models/transformer_adam')
+model = tf.keras.models.load_model('models/LSTM_ADAM')
 
 # %% Displaying 1 batch of the validation data
 
@@ -154,11 +120,11 @@ predicted_batch_7 = model.predict(val_gen[7][0])
 _, ax = plt.subplots(figsize=(10, 5))
 ax.plot(range(32),
         predicted_batch_7,
-        color='green', label='Predicted')
+        color='green',  marker='o', linestyle='dashed', label='Predicted')
 
 ax.plot(range(32),
         val_gen[7][1],
-        color='red', label='Actual')
+        color='red', label='Actual', marker='x')
 ax.legend()
 
 plt.show()
@@ -172,12 +138,10 @@ actual = []
 for i in range(32):
     predicted.extend(model.predict(val_gen[i][0]))
     actual.extend(val_gen[i][1])
-
 # %%
 
 print('Testing Loss= ', np.mean(tf.keras.losses.MSE(actual, predicted)))
-# the mean loss= 0.02899
-
+# 0.0284
 # %% plotting the validation set output vs the predicted value
 
 
@@ -216,7 +180,6 @@ for i in range(32):
     predicted_t.extend(model.predict(train_gen[i][0]))
     actual_t.extend(train_gen[i][1])
 
-
 # %% plotting the result
 fig, (ax1, ax2, ax) = plt.subplots(3, 1,  figsize=(30, 15), sharex=True)
 
@@ -246,4 +209,4 @@ plt.legend()
 plt.show()
 # In[ ]:
 model.summary()
-# parameters= 102,595
+# parameters= 54,273
