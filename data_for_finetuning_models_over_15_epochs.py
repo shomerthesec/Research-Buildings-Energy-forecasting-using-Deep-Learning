@@ -78,7 +78,7 @@ def loading_data(idx):
     train, test = train_test_split(data_cleaned,
                                    # [:, 1:],
                                    #transformed_data[:, 0],
-                                   train_size=0.2,
+                                   test_size=0.2,
                                    shuffle=False,
                                    random_state=2021)
 
@@ -102,7 +102,7 @@ def loading_data(idx):
                                                                   stride=1, batch_size=32,
                                                                   shuffle=False
                                                                   )
-    return train_gen, val_gen
+    return train_gen, val_gen[0]
 
 
 # %% loading pretrained models to finetune them for 15 epochs
@@ -131,9 +131,8 @@ for building_idx in b_id:
         time_taken = time.time() - start_time
         print(f"model {txt} took {time.time() - start_time} seconds")
 
-        for i in range(50):
-            predicted = np.append(predicted, model.predict(test_gen[i][0]))
-            actual = np.append(actual, test_gen[i][1])
+        predicted = np.append(predicted, model.predict(test_gen[0]))
+        actual = np.append(actual, test_gen[1])
 
         avg_mse = np.mean((actual - predicted)**2)
         avg_rmse = np.sqrt(np.mean((actual - predicted)**2))
