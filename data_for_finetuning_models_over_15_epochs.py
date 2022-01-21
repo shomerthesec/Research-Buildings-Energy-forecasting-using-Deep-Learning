@@ -27,7 +27,7 @@ data = pd.read_csv('content/preprocessed_train.csv')
 data = data.query('primary_use==0 & meter==0')
 
 # %%
-b_id = [118, 122, 125, 244]
+b_id = [118, 122, 125]
 
 # %%
 # a function for plotting
@@ -64,7 +64,7 @@ def plot_output(actual, predicted, title, building_idx, avg_loss, avg_rmse):
     plt.legend()
     plt.show()
     fig.savefig(
-        f'Plots/final_plots_for_specific_buildings/{title} model -- building {building_idx} -- mse {avg_loss:.5f} -- rmse {avg_rmse:.5f}.png')
+        f'Plots/Fine-tuning models 20% data/{title} model -- building {building_idx} -- mse {avg_loss:.5f} -- rmse {avg_rmse:.5f}.png')
 
 # %%
 
@@ -99,7 +99,7 @@ def loading_data(idx):
     val_gen = tf.keras.preprocessing.sequence.TimeseriesGenerator(x_val,
                                                                   y_val,
                                                                   length=6, sampling_rate=1,
-                                                                  stride=1, batch_size=32,
+                                                                  stride=1, batch_size=350,
                                                                   shuffle=False
                                                                   )
     return train_gen, val_gen[0]
@@ -153,7 +153,7 @@ for building_idx in b_id:
 # %%
 mse, rmse, t = [], [], []
 for d in [transformer, gru, lstm]:
-    for i in range(4):
+    for i in range(3):
 
         mse.append(d[i][0][0])
         rmse.append(d[i][0][1])
@@ -165,4 +165,4 @@ for d in [transformer, gru, lstm]:
 for d, n in zip([transformer, gru, lstm], ['transformer', 'gru', 'lstm']):
     print(f'--- {n} ---')
     print(' mse \t rmse \t time')
-    print(f'{d[4][0]:0.4f}\t{d[4][1]:0.4f}\t{d[4][2]:0.4f}')
+    print(f'{d[3][0]:0.4f}\t{d[3][1]:0.4f}\t{d[3][2]:0.4f}')

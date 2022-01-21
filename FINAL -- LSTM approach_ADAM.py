@@ -28,8 +28,6 @@ pipeline, data_cleaned = transformation_pipeline(
 
 
 transformed_data = pipeline.fit_transform(data_cleaned)
-display(pd.DataFrame(transformed_data, index=data_cleaned.index,
-        columns=data_cleaned.columns).head())
 
 
 # %% displaying the meter reading
@@ -83,7 +81,7 @@ model = tf.keras.Sequential([tf.keras.layers.LSTM(128, activation='relu',
 model.compile(loss='mse', optimizer=tf.keras.optimizers.Adam(0.0001))
 
 cb = tf.keras.callbacks.EarlyStopping(monitor='val_loss',
-                                      patience=10,
+                                      patience=15,
                                       restore_best_weights=True)
 # Fitting the model
 history = model.fit(train_gen,
@@ -210,3 +208,9 @@ plt.show()
 
 model.summary()
 # parameters= 71,809
+
+#%%
+
+#%%
+
+#%%

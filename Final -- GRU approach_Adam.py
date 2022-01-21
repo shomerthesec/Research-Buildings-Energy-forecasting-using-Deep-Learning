@@ -33,8 +33,10 @@ pipeline, data_cleaned = transformation_pipeline(
 
 
 transformed_data = pipeline.fit_transform(data_cleaned)
+tmp_cols=['meter_reading','air_temperature','dew_temperature','sea_level_pressure','wind_direction','wind_speed', 'day','month'	,'hour','area','floor','hour', 'season', 'weekend', 'day_of_the_week']
+
 display(pd.DataFrame(transformed_data, index=data_cleaned.index,
-        columns=data_cleaned.columns).head())
+        columns=tmp_cols).head())
 
 
 # %% displaying the meter reading
@@ -88,7 +90,7 @@ model = tf.keras.Sequential([tf.keras.layers.GRU(128, activation='relu',
 model.compile(loss='mse', optimizer=tf.keras.optimizers.Adam(0.0001))
 
 cb = tf.keras.callbacks.EarlyStopping(monitor='val_loss',
-                                      patience=10,
+                                      patience=15,
                                       restore_best_weights=True)
 # Fitting the model
 history = model.fit(train_gen,
@@ -99,7 +101,7 @@ history = model.fit(train_gen,
 # %%
 model.save(('models/GRU_ADAM'))
 # %% loading best model
-model = tf.keras.models.load_model('models/LSTM_ADAM')
+model = tf.keras.models.load_model('models/GRU_ADAM')
 
 # %% Displaying 1 batch of the validation data
 
@@ -210,3 +212,5 @@ plt.show()
 # In[ ]:
 model.summary()
 # parameters= 54,273
+
+#%%

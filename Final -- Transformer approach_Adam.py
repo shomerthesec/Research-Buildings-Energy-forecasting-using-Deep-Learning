@@ -103,7 +103,7 @@ def build_model(
 
 
 model = build_model(
-    (6, 11),  # 6 is for the window on our data 6 hours, and 11 for the features
+    (6, 14),  # 6 is for the window on our data 6 hours, and 11 for the features
     head_size=256,  # play with this
     num_heads=8,  # and this
     ff_dim=128,  # and this
@@ -247,3 +247,5 @@ plt.show()
 # In[ ]:
 model.summary()
 # parameters= 102,595
+
+#%%
