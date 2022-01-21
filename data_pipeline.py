@@ -21,10 +21,8 @@ def transformation_pipeline(data, building_id=122, meter=0, primary_use=99):
                                    ('scaler', MinMaxScaler())
                                    ])
 
-    num_attribs = ['meter_reading', 'air_temperature', 'dew_temperature',
-                   'sea_level_pressure', 'wind_direction', 'wind_speed']  # columns to transform
-    date_attribs = ['day', 'month'	, 'hour',
-                    'weekend', 'day_of_the_week', 'season']
+    num_attribs = ['meter_reading','air_temperature','dew_temperature','sea_level_pressure','wind_direction','wind_speed'] # columns to transform
+    date_attribs=['day','month'	,'hour','area','floor','hour', 'season', 'weekend', 'day_of_the_week']
 
     full_pipeline = ColumnTransformer([("num", numerical_pipeline, num_attribs),
                                        ("date", Do_nothing(),  date_attribs)])
